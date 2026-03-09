@@ -1,0 +1,12 @@
+{
+  "name": "health-dashboard",
+  "version": "1.0.0",
+  "description": "健康管理看板",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
