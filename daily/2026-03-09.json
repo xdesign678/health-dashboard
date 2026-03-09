@@ -16,10 +16,18 @@
       "note": "晚餐"
     }
   ],
-  "exercises": [],
+  "exercises": [
+    {
+      "time": "2026-03-09T21:29:00",
+      "type": "散步",
+      "duration": 30,
+      "calories": 150,
+      "note": "散步30分钟"
+    }
+  ],
   "summary": {
     "totalIntake": 1458,
-    "totalBurn": 0,
-    "deficit": -1458
+    "totalBurn": 150,
+    "deficit": -1308
   }
 }

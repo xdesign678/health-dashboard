@@ -411,45 +411,45 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>HEALTH TRACKER</h1>
-            <div class="date" id="current-date">LOADING...</div>
+            <h1>健康追踪</h1>
+            <div class="date" id="current-date">加载中...</div>
         </div>
 
         <div class="main-grid">
             <!-- 大数字：摄入 -->
             <div class="hero-stat">
-                <div class="label">Today's Intake</div>
+                <div class="label">今日摄入</div>
                 <div class="value" id="total-intake">0</div>
-                <div class="unit">KCAL</div>
+                <div class="unit">千卡</div>
             </div>
 
             <!-- 大数字：缺口 -->
             <div class="hero-stat">
-                <div class="label">Calorie Deficit</div>
+                <div class="label">热量缺口</div>
                 <div class="value" id="deficit">0</div>
-                <div class="unit">KCAL</div>
+                <div class="unit">千卡</div>
             </div>
 
             <!-- 小卡片：消耗 -->
             <div class="stat-card">
                 <span class="icon">🔥</span>
-                <div class="label">Burned</div>
+                <div class="label">已消耗</div>
                 <div class="value" id="total-burn">0</div>
             </div>
 
             <!-- 小卡片：目标 -->
             <div class="stat-card">
                 <span class="icon">🎯</span>
-                <div class="label">Target</div>
+                <div class="label">目标</div>
                 <div class="value">-1560</div>
             </div>
 
             <!-- 进度条 -->
             <div class="progress-section">
-                <h2>Progress</h2>
+                <h2>今日进度</h2>
                 <div class="progress-item">
                     <div class="progress-header">
-                        <span class="progress-label">Intake (Target: 1,500 kcal)</span>
+                        <span class="progress-label">摄入进度（目标：1,500 千卡）</span>
                         <span class="progress-value" id="intake-percent">0%</span>
                     </div>
                     <div class="progress-bar-container">
@@ -458,7 +458,7 @@
                 </div>
                 <div class="progress-item">
                     <div class="progress-header">
-                        <span class="progress-label">Burn (Target: 3,060 kcal)</span>
+                        <span class="progress-label">消耗进度（目标：3,060 千卡）</span>
                         <span class="progress-value" id="burn-percent">0%</span>
                     </div>
                     <div class="progress-bar-container">
@@ -469,25 +469,25 @@
 
             <!-- 缺口状态 -->
             <div class="deficit-indicator" id="deficit-indicator">
-                <div class="label">CURRENT DEFICIT</div>
+                <div class="label">当前缺口</div>
                 <div class="big-number" id="deficit-big">0</div>
-                <div class="status" id="deficit-status">LOADING...</div>
+                <div class="status" id="deficit-status">加载中...</div>
             </div>
         </div>
 
         <!-- 记录列表 -->
         <div class="records-grid">
             <div class="record-section">
-                <h2>🍽️ MEALS</h2>
+                <h2>🍽️ 今日饮食</h2>
                 <div id="meals-list">
-                    <div class="empty-state">Loading...</div>
+                    <div class="empty-state">加载中...</div>
                 </div>
             </div>
 
             <div class="record-section">
-                <h2>🏃 EXERCISES</h2>
+                <h2>🏃 今日运动</h2>
                 <div id="exercises-list">
-                    <div class="empty-state">Loading...</div>
+                    <div class="empty-state">加载中...</div>
                 </div>
             </div>
         </div>
@@ -499,12 +499,12 @@
         const DATA_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/daily/`;
 
         const today = new Date();
-        const dateStr = today.toLocaleDateString('en-US', { 
+        const dateStr = today.toLocaleDateString('zh-CN', { 
             year: 'numeric', 
-            month: 'short', 
+            month: 'long', 
             day: 'numeric',
-            weekday: 'short'
-        }).toUpperCase();
+            weekday: 'long'
+        });
         document.getElementById('current-date').textContent = dateStr;
 
         // 数字滚动动画
@@ -564,31 +564,31 @@
 
             const statusEl = document.getElementById('deficit-status');
             if (deficit >= 1560) {
-                statusEl.textContent = '🎉 TARGET ACHIEVED!';
+                statusEl.textContent = '🎉 太棒了！已达成今日目标！';
             } else if (deficit >= 1000) {
-                statusEl.textContent = '💪 GREAT PROGRESS!';
+                statusEl.textContent = '💪 很不错！继续保持！';
             } else {
-                statusEl.textContent = `NEED ${(1560 - deficit).toLocaleString()} MORE`;
+                statusEl.textContent = `还需要 ${(1560 - deficit).toLocaleString()} 卡缺口`;
             }
         }
 
         function updateMeals(meals) {
             const list = document.getElementById('meals-list');
             if (meals.length === 0) {
-                list.innerHTML = '<div class="empty-state">No meals recorded</div>';
+                list.innerHTML = '<div class="empty-state">暂无记录</div>';
                 return;
             }
 
             list.innerHTML = meals.map(meal => {
-                const time = new Date(meal.time).toLocaleTimeString('en-US', { 
+                const time = new Date(meal.time).toLocaleTimeString('zh-CN', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
                 return `
                     <div class="record-item">
                         <div class="time">${time} · ${meal.note}</div>
-                        <div class="content">${meal.items.join(', ')}</div>
-                        <div class="calories">${meal.calories} kcal</div>
+                        <div class="content">${meal.items.join('、')}</div>
+                        <div class="calories">${meal.calories} 千卡</div>
                     </div>
                 `;
             }).join('');
@@ -597,20 +597,20 @@
         function updateExercises(exercises) {
             const list = document.getElementById('exercises-list');
             if (exercises.length === 0) {
-                list.innerHTML = '<div class="empty-state">No exercises recorded</div>';
+                list.innerHTML = '<div class="empty-state">暂无记录</div>';
                 return;
             }
 
             list.innerHTML = exercises.map(exercise => {
-                const time = new Date(exercise.time).toLocaleTimeString('en-US', { 
+                const time = new Date(exercise.time).toLocaleTimeString('zh-CN', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
                 return `
                     <div class="record-item">
                         <div class="time">${time}</div>
-                        <div class="content">${exercise.type} · ${exercise.duration} min</div>
-                        <div class="calories">-${exercise.calories} kcal</div>
+                        <div class="content">${exercise.type} · ${exercise.duration} 分钟</div>
+                        <div class="calories">-${exercise.calories} 千卡</div>
                     </div>
                 `;
             }).join('');
