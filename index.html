@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>健康追踪 | Health Tracker</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF4D00">
     <style>
         :root {
             --primary: #FF4D00;
@@ -26,7 +25,7 @@
         }
 
         body {
-            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: var(--bg-dark);
             color: var(--text-primary);
             min-height: 100vh;
@@ -182,6 +181,13 @@
             background: var(--bg-card);
             border: 1px solid rgba(255, 255, 255, 0.05);
             padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+        }
+
+        .progress-section-inner {
+            grid-column: 1 / -1;
         }
 
         .progress-section h2 {
@@ -296,7 +302,7 @@
         /* 记录列表 */
         .records-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 20px;
             margin-top: 40px;
         }
@@ -367,7 +373,7 @@
             }
 
             .records-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
         }
 
@@ -397,7 +403,17 @@
             }
         }
 
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                scroll-behavior: auto !important;
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
+
         .main-grid > *, .records-grid > * {
+            will-change: transform, opacity;
             animation: fadeIn 0.6s ease-out backwards;
         }
 
@@ -444,9 +460,11 @@
                 <div class="value">-1560</div>
             </div>
 
-            <!-- 进度条 -->
+            <!-- 进度条 + BMR & 用水 -->
             <div class="progress-section">
-                <h2>今日进度</h2>
+                <div class="progress-section-inner">
+                    <h2>今日进度</h2>
+                </div>
                 <div class="progress-item">
                     <div class="progress-header">
                         <span class="progress-label">摄入进度（目标：1,500 千卡）</span>
@@ -465,6 +483,24 @@
                         <div class="progress-bar-fill" id="burn-progress" style="width: 0%"></div>
                     </div>
                 </div>
+                <div class="progress-item" id="bmr-card">
+                    <div class="progress-header">
+                        <span class="progress-label">基础代谢 (BMR)</span>
+                        <span class="progress-value" id="bmr-value">-</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="bmr-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="progress-item" id="water-card">
+                    <div class="progress-header">
+                        <span class="progress-label">今日饮水</span>
+                        <span class="progress-value" id="water-value">0 / 2000 ml</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="water-progress" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
 
             <!-- 缺口状态 -->
@@ -475,7 +511,7 @@
             </div>
         </div>
 
-        <!-- 记录列表 -->
+        <!-- 记录列表 + 时间轴 + 睡眠 -->
         <div class="records-grid">
             <div class="record-section">
                 <h2>🍽️ 今日饮食</h2>
@@ -490,10 +526,30 @@
                     <div class="empty-state">加载中...</div>
                 </div>
             </div>
+
+            <div class="record-section">
+                <h2>⏱️ 饮食时间轴</h2>
+                <div id="timeline-list">
+                    <div class="empty-state">加载中...</div>
+                </div>
+            </div>
+
+            <div class="record-section">
+                <h2>🌙 睡眠质量</h2>
+                <div id="sleep-card">
+                    <div class="empty-state">加载中...</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+
         const GITHUB_USER = 'xdesign678';
         const REPO_NAME = 'health-dashboard';
         const DATA_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/daily/`;
@@ -524,21 +580,70 @@
             }, 16);
         }
 
-        async function loadData() {
+        const STORAGE_KEY = 'health-dashboard-cache-v1';
+
+        function saveCache(data) {
+            try {
+                const payload = {
+                    ts: Date.now(),
+                    data
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+            } catch (e) {}
+        }
+
+        function loadCache() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const payload = JSON.parse(raw);
+                const maxAge = 1000 * 60 * 10;
+                if (Date.now() - payload.ts > maxAge) return null;
+                return payload.data;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        async function loadData(showSkeleton = true) {
+            const cached = loadCache();
+            if (cached) {
+                updateStats(cached);
+                updateMeals(cached.meals);
+                updateExercises(cached.exercises);
+                updateTimeline(cached.meals);
+                updateSleep(cached.sleep || null);
+            } else if (showSkeleton) {
+                setSkeletonState(true);
+            }
+
             try {
                 const dateKey = today.toISOString().split('T')[0];
                 const dataUrl = `${DATA_BASE_URL}${dateKey}.json`;
-                
                 const response = await fetch(dataUrl);
                 if (!response.ok) throw new Error('Data not found');
-                
                 const data = await response.json();
+                saveCache(data);
+                setSkeletonState(false);
                 updateStats(data);
                 updateMeals(data.meals);
                 updateExercises(data.exercises);
+                updateTimeline(data.meals);
+                updateSleep(data.sleep || null);
             } catch (error) {
                 console.error('Failed to load data:', error);
+                setErrorState();
             }
+        }
+
+        function calculateBMR(profile) {
+            if (!profile) return 0;
+            const { gender, weightKg, heightCm, age } = profile;
+            if (!weightKg || !heightCm || !age) return 0;
+            if (gender === 'female') {
+                return 447.593 + 9.247 * weightKg + 3.098 * heightCm - 4.33 * age;
+            }
+            return 88.362 + 13.397 * weightKg + 4.799 * heightCm - 5.677 * age;
         }
 
         function updateStats(data) {
@@ -553,7 +658,34 @@
 
             const intakeProgress = Math.min((totalIntake / 1500) * 100, 100);
             const burnProgress = Math.min((totalBurn / 3060) * 100, 100);
-            
+
+            const bmr = calculateBMR(data.profile || null);
+            const bmrEl = document.getElementById('bmr-value');
+            if (bmr && bmrEl) {
+                animateNumber(bmrEl, Math.round(bmr));
+                const bmrProgressEl = document.getElementById('bmr-progress');
+                if (bmrProgressEl) {
+                    const pct = Math.min((bmr / 2500) * 100, 100);
+                    requestAnimationFrame(() => {
+                        bmrProgressEl.style.width = pct + '%';
+                    });
+                }
+            } else if (bmrEl) {
+                bmrEl.textContent = '-';
+            }
+
+            const waterTarget = (data.goals && data.goals.waterMl) || 2000;
+            const water = (data.summary && data.summary.waterMl) || 0;
+            const waterPct = Math.min((water / waterTarget) * 100, 100);
+            const waterValueEl = document.getElementById('water-value');
+            const waterProgressEl = document.getElementById('water-progress');
+            if (waterValueEl && waterProgressEl) {
+                waterValueEl.textContent = `${water} / ${waterTarget} ml`;
+                requestAnimationFrame(() => {
+                    waterProgressEl.style.width = waterPct + '%';
+                });
+            }
+
             setTimeout(() => {
                 document.getElementById('intake-progress').style.width = intakeProgress + '%';
                 document.getElementById('intake-percent').textContent = Math.round(intakeProgress) + '%';
@@ -572,9 +704,23 @@
             }
         }
 
+        function setSkeletonState(active) {
+            const skeletonHtml = '<div class="empty-state">加载中...</div>';
+            if (active) {
+                document.getElementById('meals-list').innerHTML = skeletonHtml;
+                document.getElementById('exercises-list').innerHTML = skeletonHtml;
+            }
+        }
+
+        function setErrorState() {
+            const errorHtml = '<div class="empty-state">数据加载失败，请稍后重试</div>';
+            document.getElementById('meals-list').innerHTML = errorHtml;
+            document.getElementById('exercises-list').innerHTML = errorHtml;
+        }
+
         function updateMeals(meals) {
             const list = document.getElementById('meals-list');
-            if (meals.length === 0) {
+            if (!meals || meals.length === 0) {
                 list.innerHTML = '<div class="empty-state">暂无记录</div>';
                 return;
             }
@@ -596,7 +742,7 @@
 
         function updateExercises(exercises) {
             const list = document.getElementById('exercises-list');
-            if (exercises.length === 0) {
+            if (!exercises || exercises.length === 0) {
                 list.innerHTML = '<div class="empty-state">暂无记录</div>';
                 return;
             }
@@ -606,9 +752,11 @@
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
+                const intensity = exercise.intensity || '中等';
+                const heartRate = exercise.heartRate ? `${exercise.heartRate} bpm` : '—';
                 return `
                     <div class="record-item">
-                        <div class="time">${time}</div>
+                        <div class="time">${time} · 强度：${intensity} · 心率：${heartRate}</div>
                         <div class="content">${exercise.type} · ${exercise.duration} 分钟</div>
                         <div class="calories">-${exercise.calories} 千卡</div>
                     </div>
@@ -616,8 +764,52 @@
             }).join('');
         }
 
+        function updateTimeline(meals) {
+            const list = document.getElementById('timeline-list');
+            if (!meals || meals.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无记录</div>';
+                return;
+            }
+
+            const sorted = [...meals].sort((a, b) => new Date(a.time) - new Date(b.time));
+            list.innerHTML = sorted.map(meal => {
+                const time = new Date(meal.time).toLocaleTimeString('zh-CN', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                return `
+                    <div class="record-item">
+                        <div class="time">${time}</div>
+                        <div class="content">${meal.items.join('、')}</div>
+                        <div class="calories">${meal.calories} 千卡</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSleep(sleep) {
+            const card = document.getElementById('sleep-card');
+            if (!sleep) {
+                card.innerHTML = '<div class="empty-state">暂无睡眠数据</div>';
+                return;
+            }
+            const quality = sleep.qualityLabel || '一般';
+            const score = sleep.score || 0;
+            const hours = sleep.durationHours || 0;
+            const stages = sleep.deepHours && sleep.lightHours
+                ? `深睡 ${sleep.deepHours}h · 浅睡 ${sleep.lightHours}h`
+                : '';
+            card.innerHTML = `
+                <div class="record-item">
+                    <div class="time">得分：${score} / 100 · 质量：${quality}</div>
+                    <div class="content">时长：${hours} 小时 ${stages}</div>
+                    <div class="calories">入睡 ${sleep.bedTime || '-'} · 起床 ${sleep.wakeTime || '-'}</div>
+                </div>
+            `;
+        }
+
         loadData();
-        setInterval(loadData, 30000);
+        setInterval(() => loadData(false), 30000);
     </script>
 </body>
 </html>

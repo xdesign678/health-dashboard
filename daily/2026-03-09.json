@@ -23,11 +23,18 @@
       "duration": 30,
       "calories": 150,
       "note": "散步30分钟"
+    },
+    {
+      "time": "2026-03-09T22:49:00",
+      "type": "慢走",
+      "duration": 60,
+      "calories": 300,
+      "note": "慢走1小时"
     }
   ],
   "summary": {
     "totalIntake": 1458,
-    "totalBurn": 150,
-    "deficit": -1308
+    "totalBurn": 450,
+    "deficit": -1008
   }
 }
