@@ -1,0 +1,25 @@
+{
+  "date": "2026-03-09",
+  "meals": [
+    {
+      "time": "2026-03-09T12:00:00",
+      "type": "lunch",
+      "items": ["手撕猪肉汉堡", "半份薯条"],
+      "calories": 850,
+      "note": "午餐"
+    },
+    {
+      "time": "2026-03-09T17:58:00",
+      "type": "dinner",
+      "items": ["牛肉沙拉", "土豆", "水煮蛋", "玉米", "蔬菜"],
+      "calories": 608,
+      "note": "晚餐"
+    }
+  ],
+  "exercises": [],
+  "summary": {
+    "totalIntake": 1458,
+    "totalBurn": 0,
+    "deficit": -1458
+  }
+}

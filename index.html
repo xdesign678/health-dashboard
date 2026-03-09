@@ -176,6 +176,15 @@
             margin: 10px 0;
         }
 
+        .error-message {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -194,25 +203,27 @@
             <p>今日数据看板 - <span id="current-date"></span></p>
         </div>
 
+        <div id="error-container"></div>
+
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="icon">🍽️</div>
                 <div class="label">今日摄入</div>
-                <div class="value" id="total-intake">0</div>
+                <div class="value" id="total-intake">加载中...</div>
                 <div class="subtext">卡路里</div>
             </div>
 
             <div class="stat-card">
                 <div class="icon">🔥</div>
                 <div class="label">今日消耗</div>
-                <div class="value" id="total-burn">0</div>
+                <div class="value" id="total-burn">加载中...</div>
                 <div class="subtext">卡路里</div>
             </div>
 
             <div class="stat-card">
                 <div class="icon">📊</div>
                 <div class="label">热量缺口</div>
-                <div class="value" id="deficit">0</div>
+                <div class="value" id="deficit">加载中...</div>
                 <div class="subtext">卡路里</div>
             </div>
 
@@ -241,26 +252,31 @@
             <div class="deficit-indicator" id="deficit-indicator">
                 <p>当前热量缺口</p>
                 <div class="big-number" id="deficit-big">0</div>
-                <p id="deficit-status">继续加油！</p>
+                <p id="deficit-status">加载中...</p>
             </div>
         </div>
 
         <div class="meals-section">
             <h2>🍽️ 今日饮食</h2>
             <div id="meals-list">
-                <div class="empty-state">暂无记录</div>
+                <div class="empty-state">加载中...</div>
             </div>
         </div>
 
         <div class="exercises-section">
             <h2>🏃 今日运动</h2>
             <div id="exercises-list">
-                <div class="empty-state">暂无记录</div>
+                <div class="empty-state">加载中...</div>
             </div>
         </div>
     </div>
 
     <script>
+        // GitHub Raw 文件地址
+        const GITHUB_USER = 'xdesign678';
+        const REPO_NAME = 'health-dashboard';
+        const DATA_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/daily/`;
+
         // 设置当前日期
         const today = new Date();
         const dateStr = today.toLocaleDateString('zh-CN', { 
@@ -275,15 +291,36 @@
         async function loadData() {
             try {
                 const dateKey = today.toISOString().split('T')[0];
-                const response = await fetch(`../daily/${dateKey}.json`);
+                const dataUrl = `${DATA_BASE_URL}${dateKey}.json`;
+                
+                console.log('正在加载数据:', dataUrl);
+                
+                const response = await fetch(dataUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 const data = await response.json();
                 
                 updateStats(data);
                 updateMeals(data.meals);
                 updateExercises(data.exercises);
+                
+                // 清除错误信息
+                document.getElementById('error-container').innerHTML = '';
             } catch (error) {
                 console.error('加载数据失败:', error);
+                showError(`无法加载数据: ${error.message}。数据可能还未同步到 GitHub，请稍后刷新。`);
             }
+        }
+
+        function showError(message) {
+            document.getElementById('error-container').innerHTML = `
+                <div class="error-message">
+                    ⚠️ ${message}
+                </div>
+            `;
         }
 
         function updateStats(data) {
@@ -374,8 +411,10 @@
             }).join('');
         }
 
-        // 每30秒自动刷新数据
+        // 页面加载时获取数据
         loadData();
+        
+        // 每30秒自动刷新数据
         setInterval(loadData, 30000);
     </script>
 </body>
