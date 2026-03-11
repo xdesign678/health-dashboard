@@ -105,14 +105,44 @@
             font-size:0.9rem; font-weight:600; transition:all 0.2s;
         }
         .wn button:hover, .mn button:hover { border-color:var(--primary); }
-        .ws { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+        .ws { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+
+        /* 周进度格子 */
+        .week-progress-card {
+            background:var(--bg-card); border:1px solid var(--border);
+            padding:24px; margin-bottom:24px;
+        }
+        .week-progress-card h3 { font-size:1rem; font-weight:700; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; }
+        .wp-sub { font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px; }
+        .wp-grid {
+            display:grid; grid-template-columns:repeat(20,1fr); gap:3px;
+        }
+        .wp-cell {
+            aspect-ratio:1; border-radius:2px;
+            background:rgba(255,255,255,0.06);
+            transition: background 0.3s;
+        }
+        .wp-cell.filled {
+            background:linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        .wp-cell.filled.over {
+            background:linear-gradient(135deg, var(--success), #00cc66);
+        }
+        .wp-pct {
+            margin-top:12px; display:flex; justify-content:space-between; align-items:center;
+        }
+        .wp-pct-num { font-size:2rem; font-weight:700; }
+        .wp-pct-num.gr { background:linear-gradient(135deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        .wp-pct-label { font-size:0.85rem; color:var(--text-secondary); }
 
         .wc { background:var(--bg-card); border:1px solid var(--border); padding:24px; margin-bottom:24px; }
         .wc h3 { font-size:1rem; font-weight:700; margin-bottom:20px; text-transform:uppercase; letter-spacing:0.05em; }
-        .bars { display:flex; align-items:flex-end; gap:8px; height:200px; }
-        .bg { flex:1; display:flex; flex-direction:column; align-items:center; height:100%; }
-        .bw { flex:1; width:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; }
-        .bar { width:55%; border-radius:3px 3px 0 0; transition:height 0.6s ease; min-height:2px; }
+        .bars {
+            display:grid; grid-template-columns:repeat(7,1fr); gap:8px;
+            height:200px; align-items:end;
+        }
+        .bg { display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; }
+        .bar { width:70%; border-radius:3px 3px 0 0; transition:height 0.6s ease; min-height:2px; }
         .bar.def { background:linear-gradient(180deg,var(--primary),var(--secondary)); }
         .bar.neg { background:linear-gradient(180deg,var(--danger),#ff6666); }
         .bv { font-size:0.7rem; font-weight:700; color:var(--text-secondary); margin-top:4px; }
@@ -189,6 +219,7 @@
             .today-grid,.ws,.ms { grid-template-columns:repeat(2,1fr); }
             .metric-card.hl { grid-column:span 2; }
             .bars { height:160px; gap:4px; }
+            .wp-grid { grid-template-columns:repeat(10,1fr) !important; }
             .rec-grid { grid-template-columns:1fr; }
             table { font-size:0.85rem; }
             th,td { padding:8px 6px; }
@@ -230,8 +261,17 @@
     <!-- WEEK -->
     <div id="view-week" class="view">
         <div class="wh"><h2 id="wt2">本周</h2><div class="wn"><button id="wp">← 上周</button><button id="wc2">本周</button><button id="wnx">下周 →</button></div></div>
+        <!-- 周进度格子 -->
+        <div class="week-progress-card">
+            <h3>📊 周目标进度</h3>
+            <div class="wp-sub" id="wp-sub">周累计缺口 — / 10,800 卡</div>
+            <div class="wp-grid" id="wp-grid"></div>
+            <div class="wp-pct">
+                <div><span class="wp-pct-num gr" id="wp-pct">0%</span></div>
+                <div class="wp-pct-label" id="wp-remain">剩余 10,800 卡</div>
+            </div>
+        </div>
         <div class="ws">
-            <div class="metric-card"><div class="ml">周累计缺口</div><div class="mv gr" id="wd">—</div><div class="mu">/ 10,800 卡</div></div>
             <div class="metric-card"><div class="ml">日均缺口</div><div class="mv" id="wa">—</div></div>
             <div class="metric-card"><div class="ml">日均摄入</div><div class="mv" id="wi">—</div></div>
             <div class="metric-card"><div class="ml">总运动时长</div><div class="mv" id="we">—</div><div class="mu">分钟</div></div>
@@ -375,21 +415,35 @@ async function loadWeek(){
     }
     let totalDef=0,totalIntake=0,totalExMin=0,cnt=0;
     days.forEach(({p})=>{if(p){totalDef+=p.deficit;totalIntake+=p.intake;totalExMin+=p.exMin;cnt++;}});
-    el('wd').textContent=cnt?totalDef.toLocaleString():'—';
+    
+    // 周进度格子 (100格 = 10,800卡)
+    const pct=Math.min(totalDef/WEEK_TARGET*100, 120);
+    const filledCells=Math.min(Math.round(pct), 100);
+    const isOver=totalDef>=WEEK_TARGET;
+    let gridHtml='';
+    for(let i=0;i<100;i++){
+        const filled=i<filledCells;
+        gridHtml+=`<div class="wp-cell${filled?(isOver?' filled over':' filled'):''}"></div>`;
+    }
+    el('wp-grid').innerHTML=gridHtml;
+    el('wp-sub').textContent=`周累计缺口 ${cnt?totalDef.toLocaleString():'—'} / 10,800 卡`;
+    el('wp-pct').textContent=Math.round(pct)+'%';
+    el('wp-remain').textContent=totalDef>=WEEK_TARGET?'🎉 已达成周目标！':`剩余 ${(WEEK_TARGET-totalDef).toLocaleString()} 卡`;
+    
     el('wa').textContent=cnt?Math.round(totalDef/cnt).toLocaleString():'—';
     el('wi').textContent=cnt?Math.round(totalIntake/cnt).toLocaleString():'—';
     el('we').textContent=cnt?totalExMin:'—';
 
-    // bar chart
-    const maxDef=Math.max(TARGET_DEF,...days.map(({p})=>p?p.deficit:0));
-    const barH=180;
+    // bar chart (fixed grid layout)
+    const maxDef=Math.max(TARGET_DEF,...days.map(({p})=>p?Math.abs(p.deficit):0));
+    const barH=170;
     const bc=el('wb');
     bc.innerHTML=days.map(({date,p})=>{
         const label=fmtCN(date);
-        if(!p) return`<div class="bg"><div class="bw"><div class="bar lv0" style="height:2px"></div></div><div class="bv">—</div><div class="bl">${label}</div></div>`;
-        const h=Math.max(2,Math.abs(p.deficit)/maxDef*barH);
+        if(!p) return`<div class="bg"><div class="bar lv0" style="height:2px"></div><div class="bv">—</div><div class="bl">${label}</div></div>`;
+        const h=Math.max(4,Math.abs(p.deficit)/maxDef*barH);
         const cls=p.deficit>=0?'def':'neg';
-        return`<div class="bg"><div class="bw"><div class="bar ${cls}" style="height:${h}px"></div></div><div class="bv">${p.deficit.toLocaleString()}</div><div class="bl">${label}</div></div>`;
+        return`<div class="bg"><div class="bar ${cls}" style="height:${h}px"></div><div class="bv">${p.deficit.toLocaleString()}</div><div class="bl">${label}</div></div>`;
     }).join('');
 
     // table
