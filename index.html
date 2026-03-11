@@ -128,6 +128,9 @@
         .wp-cell.filled.over {
             background:linear-gradient(135deg, var(--success), #00cc66);
         }
+        .wp-cell.expect {
+            box-shadow: inset 0 0 0 2px #fff;
+        }
         .wp-pct {
             margin-top:12px; display:flex; justify-content:space-between; align-items:center;
         }
@@ -268,7 +271,11 @@
             <div class="wp-grid" id="wp-grid"></div>
             <div class="wp-pct">
                 <div><span class="wp-pct-num gr" id="wp-pct">0%</span></div>
-                <div class="wp-pct-label" id="wp-remain">剩余 10,800 卡</div>
+                <div style="text-align:right">
+                    <div class="wp-pct-label" id="wp-remain">剩余 10,800 卡</div>
+                    <div class="wp-pct-label" id="wp-expect" style="margin-top:4px">应达 — 卡</div>
+                    <div class="wp-pct-label" id="wp-actual">实际 — 卡</div>
+                </div>
             </div>
         </div>
         <div class="ws">
@@ -417,18 +424,47 @@ async function loadWeek(){
     days.forEach(({p})=>{if(p){totalDef+=p.deficit;totalIntake+=p.intake;totalExMin+=p.exMin;cnt++;}});
     
     // 周进度格子 (100格 = 10,800卡)
+    // 计算已过天数和应达缺口
+    const todayTs=new Date(); todayTs.setHours(23,59,59);
+    let daysPassed=0;
+    for(let i=0;i<7;i++){
+        if(addD(start,i)<=todayTs) daysPassed++;
+    }
+    const expectedDef=Math.round(WEEK_TARGET/7*daysPassed);
     const pct=Math.min(totalDef/WEEK_TARGET*100, 120);
+    const expectedPct=Math.min(expectedDef/WEEK_TARGET*100, 100);
     const filledCells=Math.min(Math.round(pct), 100);
+    const expectedCell=Math.min(Math.round(expectedPct), 100);
     const isOver=totalDef>=WEEK_TARGET;
+    const isAhead=totalDef>=expectedDef;
     let gridHtml='';
     for(let i=0;i<100;i++){
         const filled=i<filledCells;
-        gridHtml+=`<div class="wp-cell${filled?(isOver?' filled over':' filled'):''}"></div>`;
+        const isExpectLine=(i===expectedCell-1);
+        let cls='wp-cell';
+        if(filled) cls+=isOver?' filled over':' filled';
+        if(isExpectLine) cls+=' expect';
+        gridHtml+=`<div class="${cls}"></div>`;
     }
     el('wp-grid').innerHTML=gridHtml;
-    el('wp-sub').textContent=`周累计缺口 ${cnt?totalDef.toLocaleString():'—'} / 10,800 卡`;
+    el('wp-sub').innerHTML=`周累计缺口 <b>${cnt?totalDef.toLocaleString():'—'}</b> / 10,800 卡`;
     el('wp-pct').textContent=Math.round(pct)+'%';
-    el('wp-remain').textContent=totalDef>=WEEK_TARGET?'🎉 已达成周目标！':`剩余 ${(WEEK_TARGET-totalDef).toLocaleString()} 卡`;
+    
+    // 应达 vs 实际对比
+    const diffDef=totalDef-expectedDef;
+    let remainText='';
+    if(totalDef>=WEEK_TARGET){
+        remainText='🎉 已达成周目标！';
+    } else if(isAhead){
+        remainText=`✅ 超前进度 +${diffDef.toLocaleString()} 卡`;
+    } else {
+        remainText=`⚠️ 落后进度 ${diffDef.toLocaleString()} 卡`;
+    }
+    el('wp-remain').textContent=remainText;
+    
+    // 应达 vs 实际 数字
+    el('wp-expect').innerHTML=`应达 <b>${expectedDef.toLocaleString()}</b> 卡（${daysPassed}天 × ${Math.round(WEEK_TARGET/7).toLocaleString()}）`;
+    el('wp-actual').innerHTML=`实际 <b style="color:${isAhead?'var(--success)':'var(--danger)'}">${totalDef.toLocaleString()}</b> 卡`;
     
     el('wa').textContent=cnt?Math.round(totalDef/cnt).toLocaleString():'—';
     el('wi').textContent=cnt?Math.round(totalIntake/cnt).toLocaleString():'—';
