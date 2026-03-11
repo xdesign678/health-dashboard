@@ -457,7 +457,7 @@
             <div class="stat-card">
                 <span class="icon">🎯</span>
                 <div class="label">目标</div>
-                <div class="value">-1560</div>
+                <div class="value">-1540</div>
             </div>
 
             <!-- 进度条 + BMR & 用水 -->
@@ -552,7 +552,7 @@
 
         const GITHUB_USER = 'xdesign678';
         const REPO_NAME = 'health-dashboard';
-        const DATA_BASE_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/daily/`;
+        const DATA_BASE_URL = 'daily/';
 
         const today = new Date();
         const dateStr = today.toLocaleDateString('zh-CN', { 
@@ -648,7 +648,7 @@
 
         function updateStats(data) {
             const totalIntake = data.summary.totalIntake;
-            const totalBurn = data.summary.totalBurn + 2560;
+            const totalBurn = data.summary.totalBurn + 2100;
             const deficit = totalBurn - totalIntake;
 
             animateNumber(document.getElementById('total-intake'), totalIntake);
@@ -695,12 +695,12 @@
             }, 500);
 
             const statusEl = document.getElementById('deficit-status');
-            if (deficit >= 1560) {
+            if (deficit >= 1540) {
                 statusEl.textContent = '🎉 太棒了！已达成今日目标！';
             } else if (deficit >= 1000) {
                 statusEl.textContent = '💪 很不错！继续保持！';
             } else {
-                statusEl.textContent = `还需要 ${(1560 - deficit).toLocaleString()} 卡缺口`;
+                statusEl.textContent = `还需要 ${(1540 - deficit).toLocaleString()} 卡缺口`;
             }
         }
 
