@@ -275,6 +275,7 @@
                     <div class="wp-pct-label" id="wp-remain">剩余 10,800 卡</div>
                     <div class="wp-pct-label" id="wp-expect" style="margin-top:4px">应达 — 卡</div>
                     <div class="wp-pct-label" id="wp-actual">实际 — 卡</div>
+                    <div class="wp-pct-label" id="wp-weight" style="margin-top:4px">如期达成可减 — 斤</div>
                 </div>
             </div>
         </div>
@@ -465,6 +466,10 @@ async function loadWeek(){
     // 应达 vs 实际 数字
     el('wp-expect').innerHTML=`应达 <b>${expectedDef.toLocaleString()}</b> 卡（${daysPassed}天 × ${Math.round(WEEK_TARGET/7).toLocaleString()}）`;
     el('wp-actual').innerHTML=`实际 <b style="color:${isAhead?'var(--success)':'var(--danger)'}">${totalDef.toLocaleString()}</b> 卡`;
+    // 预计减重（斤）：7700卡 = 1kg = 2斤
+    const expectedJin=cnt?(totalDef/7700*2).toFixed(1):'—';
+    const weekFullJin=(WEEK_TARGET/7700*2).toFixed(1);
+    el('wp-weight').innerHTML=`如期达成可减 <b style="color:var(--success)">${weekFullJin} 斤</b>（当前进度约 ${expectedJin} 斤）`;
     
     el('wa').textContent=cnt?Math.round(totalDef/cnt).toLocaleString():'—';
     el('wi').textContent=cnt?Math.round(totalIntake/cnt).toLocaleString():'—';
