@@ -1,18 +1,57 @@
 {
   "date": "2026-03-11",
+  "target_calories": 1300,
   "meals": [
     {
-      "time": "2026-03-11T12:05:00",
       "type": "lunch",
+      "time": "2026-03-11T12:05:00",
+      "name": "意式肉丸意面",
       "items": ["意式肉丸意面（番茄酱底）"],
+      "details": "番茄酱底意面 + 肉丸，餐厅外卖",
+      "price": 62,
       "calories": 630,
       "note": "午餐"
+    },
+    {
+      "type": "dinner",
+      "time": "2026-03-11T18:50:00",
+      "name": "蔬菜沙拉",
+      "items": ["混合生菜", "玉米粒", "胡萝卜丁", "黄瓜", "小番茄", "水煮蛋半个"],
+      "calories": 180,
+      "note": "晚餐"
+    },
+    {
+      "type": "dinner",
+      "time": "2026-03-11T18:51:00",
+      "name": "牛肉蛋堡（半份）",
+      "items": ["面饼半份", "牛肉饼", "煎蛋", "生菜"],
+      "details": "牛肉蛋堡，面饼只吃了一半",
+      "calories": 320,
+      "note": "晚餐"
     }
   ],
-  "exercises": [],
+  "exercises": [
+    {
+      "time": "2026-03-11T21:00:00",
+      "type": "走路",
+      "duration": 60,
+      "calories": 250,
+      "note": "走路1小时"
+    }
+  ],
+  "exercise": [
+    {
+      "type": "walking",
+      "name": "走路",
+      "duration_min": 60,
+      "calories_burned": 250
+    }
+  ],
+  "total_intake": 1130,
+  "total_burned": 250,
+  "net_calories": 880,
   "summary": {
-    "totalIntake": 630,
-    "totalBurn": 0,
-    "deficit": 0
+    "totalIntake": 1130,
+    "totalBurn": 250
   }
 }
