@@ -1,16 +1,19 @@
 {
   "date": "2026-03-10",
+  "targetCalories": 1300,
   "meals": [
     {
-      "time": "2026-03-10T12:00:00",
       "type": "lunch",
-      "items": ["白米饭", "炒空心菜", "番茄炒蛋", "香蕉"],
+      "time": "12:00",
+      "name": "中式快餐盖饭",
+      "items": ["白米饭", "炒空心菜(大份)", "番茄炒蛋(少量)", "香蕉1根"],
       "calories": 460,
       "note": "午餐"
     },
     {
-      "time": "2026-03-10T19:00:00",
       "type": "dinner",
+      "time": "19:00",
+      "name": "牛肉烩面",
       "items": ["牛肉烩面（大半碗）"],
       "calories": 450,
       "note": "晚餐"
@@ -18,16 +21,18 @@
   ],
   "exercises": [
     {
-      "time": "2026-03-10T18:00:00",
-      "type": "走路",
-      "duration": 60,
-      "calories": 250,
+      "type": "walking",
+      "name": "走路",
+      "time": "21:00",
+      "durationMin": 60,
+      "caloriesBurned": 250,
       "note": "走路1小时"
     }
   ],
   "summary": {
     "totalIntake": 910,
-    "totalBurn": 250,
-    "deficit": -1440
+    "totalBurned": 250,
+    "netCalories": 660,
+    "deficit": 1440
   }
 }

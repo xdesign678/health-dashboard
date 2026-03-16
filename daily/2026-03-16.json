@@ -1,0 +1,42 @@
+{
+  "date": "2026-03-16",
+  "meals": [
+    {
+      "type": "lunch",
+      "time": "2026-03-16T13:00:00",
+      "items": ["番茄肉丸意面"],
+      "calories": 560,
+      "note": "午餐"
+    },
+    {
+      "type": "dinner",
+      "time": "2026-03-16T19:00:00",
+      "items": ["牛腩饭"],
+      "calories": 560,
+      "note": "晚餐"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "跑步",
+      "time": "2026-03-16T20:00:00",
+      "duration": 30,
+      "calories": 300,
+      "note": "跑步"
+    },
+    {
+      "type": "慢走",
+      "time": "2026-03-16T20:30:00",
+      "duration": 60,
+      "calories": 180,
+      "note": "慢走1小时"
+    }
+  ],
+  "summary": {
+    "totalIntake": 1120,
+    "totalBurn": 480,
+    "deficit": 1460
+  },
+  "notes": "早餐未吃",
+  "status": "complete"
+}

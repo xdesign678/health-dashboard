@@ -1,0 +1,35 @@
+{
+  "date": "2026-03-15",
+  "meals": [
+    {
+      "type": "lunch",
+      "time": "2026-03-15T13:00:00",
+      "items": ["朝发牛肉火锅（牛肉+锅底+配菜+蘸料）"],
+      "calories": 800,
+      "note": "午餐"
+    },
+    {
+      "type": "dinner",
+      "time": "2026-03-15T19:00:00",
+      "items": ["小份牛腩火锅", "半碗米饭"],
+      "calories": 515,
+      "note": "晚餐"
+    }
+  ],
+  "exercises": [
+    {
+      "type": "椭圆机",
+      "time": "2026-03-15T21:00:00",
+      "duration": 60,
+      "calories": 230,
+      "note": "椭圆机约1小时，机器显示200多卡"
+    }
+  ],
+  "summary": {
+    "totalIntake": 1315,
+    "totalBurn": 230,
+    "deficit": 1015
+  },
+  "notes": "早餐未吃",
+  "status": "complete"
+}

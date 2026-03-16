@@ -1,16 +1,19 @@
 {
   "date": "2026-03-09",
+  "targetCalories": 1300,
   "meals": [
     {
-      "time": "2026-03-09T12:00:00",
       "type": "lunch",
+      "time": "12:00",
+      "name": "手撕猪肉汉堡套餐",
       "items": ["手撕猪肉汉堡", "半份薯条"],
       "calories": 850,
       "note": "午餐"
     },
     {
-      "time": "2026-03-09T17:58:00",
       "type": "dinner",
+      "time": "17:58",
+      "name": "牛肉沙拉套餐",
       "items": ["牛肉沙拉", "土豆", "水煮蛋", "玉米", "蔬菜"],
       "calories": 608,
       "note": "晚餐"
@@ -18,23 +21,26 @@
   ],
   "exercises": [
     {
-      "time": "2026-03-09T21:29:00",
-      "type": "散步",
-      "duration": 30,
-      "calories": 150,
+      "type": "walking",
+      "name": "散步",
+      "time": "21:29",
+      "durationMin": 30,
+      "caloriesBurned": 150,
       "note": "散步30分钟"
     },
     {
-      "time": "2026-03-09T22:49:00",
-      "type": "慢走",
-      "duration": 60,
-      "calories": 300,
+      "type": "walking",
+      "name": "慢走",
+      "time": "22:49",
+      "durationMin": 60,
+      "caloriesBurned": 300,
       "note": "慢走1小时"
     }
   ],
   "summary": {
     "totalIntake": 1458,
-    "totalBurn": 450,
-    "deficit": -1008
+    "totalBurned": 450,
+    "netCalories": 1008,
+    "deficit": 1092
   }
 }
