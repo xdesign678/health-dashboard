@@ -1,0 +1,34 @@
+{
+  "date": "2026-03-18",
+  "meals": [
+    {
+      "type": "lunch",
+      "time": "13:00",
+      "items": [
+        { "name": "沙茶嫩牛肉干粿", "calories": 410, "detail": "粿条约150g(210卡) + 牛肉片约60g(120卡) + 沙茶酱汁(80卡)" },
+        { "name": "+嫩牛肉", "calories": 100, "detail": "额外牛肉约50g" }
+      ],
+      "totalCalories": 510
+    },
+    {
+      "type": "dinner",
+      "time": "19:00",
+      "items": [
+        { "name": "精肉酸菜饺", "calories": 400, "detail": "水饺约8-10个，全吃完" },
+        { "name": "五香猪肝", "calories": 87, "detail": "猪肝约100g，吃了2/3" },
+        { "name": "小葱拌豆腐", "calories": 120, "detail": "豆腐约200g，吃了2/3" }
+      ],
+      "totalCalories": 607
+    }
+  ],
+  "exercise": [],
+  "summary": {
+    "totalIntake": 1117,
+    "totalExercise": 0,
+    "netIntake": 1117,
+    "tdee": 2100,
+    "deficit": 983
+  },
+  "notes": "早餐未吃",
+  "status": "complete"
+}

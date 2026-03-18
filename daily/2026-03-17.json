@@ -1,5 +1,5 @@
 {
-  "date": "2026-03-16",
+  "date": "2026-03-17",
   "meals": [
     {
       "type": "lunch",
@@ -13,22 +13,21 @@
       "type": "dinner",
       "time": "19:00",
       "items": [
-        { "name": "牛腩饭", "calories": 560, "detail": "米饭约200g(230卡) + 牛腩约150g(330卡)" }
+        { "name": "肉末拌面", "calories": 480, "detail": "面条约150g(220卡) + 肉末约80g(200卡) + 调料/油(60卡)" }
       ],
-      "totalCalories": 560
+      "totalCalories": 480
     }
   ],
   "exercise": [
-    { "type": "跑步", "calories": 300 },
-    { "type": "慢走", "duration": "60min", "calories": 180 }
+    { "type": "跑走结合", "duration": "90min", "calories": 480, "detail": "跑步约40分钟(300卡) + 快走约50分钟(180卡)" }
   ],
   "summary": {
-    "totalIntake": 1120,
+    "totalIntake": 1040,
     "totalExercise": 480,
-    "netIntake": 640,
+    "netIntake": 560,
     "tdee": 2100,
-    "deficit": 1460
+    "deficit": 1540
   },
-  "notes": "早餐未吃，跳过",
+  "notes": "早餐未吃",
   "status": "complete"
 }

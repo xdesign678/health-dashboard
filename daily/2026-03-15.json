@@ -3,33 +3,32 @@
   "meals": [
     {
       "type": "lunch",
-      "time": "2026-03-15T13:00:00",
-      "items": ["朝发牛肉火锅（牛肉+锅底+配菜+蘸料）"],
-      "calories": 800,
-      "note": "午餐"
+      "time": "13:00",
+      "items": [
+        { "name": "朝发牛肉火锅", "calories": 800, "detail": "牛肉(300卡) + 锅底油脂(200卡) + 配菜(200卡) + 蘸料(100卡)" }
+      ],
+      "totalCalories": 800
     },
     {
       "type": "dinner",
-      "time": "2026-03-15T19:00:00",
-      "items": ["小份牛腩火锅", "半碗米饭"],
-      "calories": 515,
-      "note": "晚餐"
+      "time": "19:00",
+      "items": [
+        { "name": "小份牛腩火锅", "calories": 400 },
+        { "name": "半碗米饭", "calories": 115, "detail": "约100g" }
+      ],
+      "totalCalories": 515
     }
   ],
-  "exercises": [
-    {
-      "type": "椭圆机",
-      "time": "2026-03-15T21:00:00",
-      "duration": 60,
-      "calories": 230,
-      "note": "椭圆机约1小时，机器显示200多卡"
-    }
+  "exercise": [
+    { "type": "椭圆机", "duration": "~60min", "calories": 230 }
   ],
   "summary": {
     "totalIntake": 1315,
-    "totalBurn": 230,
+    "totalExercise": 230,
+    "netIntake": 1085,
+    "tdee": 2100,
     "deficit": 1015
   },
-  "notes": "早餐未吃",
+  "notes": "早餐未吃，跳过",
   "status": "complete"
 }
